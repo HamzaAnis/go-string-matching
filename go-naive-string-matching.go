@@ -1,41 +1,48 @@
 package main
 
 import (
-	"fmt"
 	"io/ioutil"
+
+	"github.com/fatih/color"
 )
 
 func main() {
-	code, _ := ioutil.ReadFile("IccUtils.java")
-	codeStr := string(code)
-	// rdr := bufio.NewReader(os.Stdin)
-	// fmt.Println("Please enter a string for matching")
-	// p, _ := rdr.ReadString('\n')
+	fileName := []string{"IccUtils.java", "EncodeException.java", "GsmAlphabet.java"}
+	for _, val := range fileName {
+		code, _ := ioutil.ReadFile(val)
+		codeStr := string(code)
+		word, _ := findMatch(codeStr, "package", '\n')
+		color.Blue("Package name" + word)
+		word, _ = findMatch(codeStr, "class", '{')
+		color.Green("\t\t\tClass name\n" + word[:len(word)-2] + "\n")
+		word, _ = findMatch(codeStr, "public", '{')
+		color.Yellow("\t\t\tMethods\n", word)
+		word, _ = findMatch(codeStr, "private", '{')
+		color.Yellow(word)
 
-	findPackage(codeStr)
+		_, count := findMatch(codeStr, "for", '\n')
+		color.Blue(" Loops are %v ", count)
+	}
 }
-func findPackage(text string) {
-
-	pckg := "package"
-	// pckgName := make([]string, 0)
-
+func findMatch(text string, toFind string, terminator int) (string, int) {
 	pckgName := ""
-	fmt.Println(len(text))
+	count := 0
+
 	for i := 0; i < len(text); i++ {
 		j := 0
-		for j = 0; j < len(pckg); j++ {
-			if string(text[i+j]) != string(pckg[j]) {
+		for j = 0; j < len(toFind); j++ {
+			if string(text[i+j]) != string(toFind[j]) {
 				break
 			}
 		}
-		if j == len(pckg) {
-			fmt.Println("It is found at", i, string(text[i:i+len(pckg)]))
-			for text[i] != '\n' {
+		if j == len(toFind) {
+			for text[i] != byte(terminator) {
 				pckgName += string(text[i])
 				i++
 			}
+			pckgName += "\n"
+			count++
 		}
-
 	}
-	fmt.Println(pckgName)
+	return pckgName, count
 }
