@@ -17,6 +17,9 @@ func main() {
 func findPackage(text string) {
 
 	pckg := "package"
+	// pckgName := make([]string, 0)
+
+	pckgName := ""
 	fmt.Println(len(text))
 	for i := 0; i < len(text); i++ {
 		j := 0
@@ -27,6 +30,12 @@ func findPackage(text string) {
 		}
 		if j == len(pckg) {
 			fmt.Println("It is found at", i, string(text[i:i+len(pckg)]))
+			for text[i] != '\n' {
+				pckgName += string(text[i])
+				i++
+			}
 		}
+
 	}
+	fmt.Println(pckgName)
 }
