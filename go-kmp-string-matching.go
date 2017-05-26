@@ -1,16 +1,20 @@
 package main
 
-import "io/ioutil"
+import (
+	"io/ioutil"
+)
 
 func main() {
 	fileName := []string{"IccUtils.java"}
 	for _, val := range fileName {
 		code, _ := ioutil.ReadFile(val)
 		codeStr := string(code)
-		// word, _ := findMatch(codeStr, "package", '\n')
+		findMatch(codeStr, "package", '\n')
 	}
 }
 func findMatch(text string, toFind string, terminator int) (string, int) {
+	word := ""
+	count := 0
 	lps := make([]int, len(toFind))
 	j := 0
 
@@ -31,29 +35,30 @@ func findMatch(text string, toFind string, terminator int) (string, int) {
 				i++
 			}
 		}
-		// if j == len(toFind) {
-		// 	fmt.Println("Found")
-		// 	j = lps[j-1]
-		// }
+
 	}
 
 	i = 0
+	j = 0
 	for i < len(text) {
-		if string(toFind[i]) == string(toFind[l]) {
+		if string(toFind[j]) == string(text[i]) {
 			j++
 			i++
-		} else {
-			if l != 0 {
-				l = lps[l-1]
+		}
+		if j == len(toFind) {
+			for text[i] != byte(terminator) {
+				word += string(text[i])
+				i++
+				count++
+			}
+			j = lps[j-1]
+		} else if i < len(text) && string(toFind[j]) != string(text[i]) {
+			if j != 0 {
+				j = lps[j-1]
 			} else {
-				lps[i] = l
 				i++
 			}
 		}
-		// if j == len(toFind) {
-		// 	fmt.Println("Found")
-		// 	j = lps[j-1]
-		// }
 	}
-
+	return word, count
 }
