@@ -2,14 +2,31 @@ package main
 
 import (
 	"io/ioutil"
+
+	"github.com/fatih/color"
 )
 
 func main() {
 	fileName := []string{"IccUtils.java"}
+	// for _, val := range fileName {
+	// 	code, _ := ioutil.ReadFile(val)
+	// 	codeStr := string(code)
+	// 	findMatch(codeStr, "package", '\n')
+	// }
 	for _, val := range fileName {
 		code, _ := ioutil.ReadFile(val)
 		codeStr := string(code)
-		findMatch(codeStr, "package", '\n')
+		word, _ := findMatch(codeStr, "package", '\n')
+		color.Blue("Package name" + word)
+		word, _ = findMatch(codeStr, "class", '{')
+		color.Green("\t\t\tClass name\n" + word[:len(word)-2] + "\n")
+		word, _ = findMatch(codeStr, "public", '{')
+		color.Yellow("\t\t\tMethods\n", word)
+		word, _ = findMatch(codeStr, "private", '{')
+		color.Yellow(word)
+
+		_, count := findMatch(codeStr, "for", '\n')
+		color.Blue(" Loops are %v ", count)
 	}
 }
 func findMatch(text string, toFind string, terminator int) (string, int) {
@@ -49,8 +66,9 @@ func findMatch(text string, toFind string, terminator int) (string, int) {
 			for text[i] != byte(terminator) {
 				word += string(text[i])
 				i++
-				count++
 			}
+			word += "\n"
+			count++
 			j = lps[j-1]
 		} else if i < len(text) && string(toFind[j]) != string(text[i]) {
 			if j != 0 {
